@@ -1,0 +1,7 @@
+{:paths ["src"]
+ :deps {org.clojure/clojure {:mvn/version "1.12.1"}
+        metosin/malli {:mvn/version "0.19.1"}}
+ :aliases
+ {:lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.07.28"}}
+         :main-opts ["-m" "clj-kondo.main"
+                     "--lint" "src"]}}}
