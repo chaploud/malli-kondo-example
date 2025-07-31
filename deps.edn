@@ -4,4 +4,5 @@
  :aliases
  {:lint {:extra-deps {clj-kondo/clj-kondo {:mvn/version "2025.07.28"}}
          :main-opts ["-m" "clj-kondo.main"
-                     "--lint" "src"]}}}
+                     "--lint" "src"]}
+  :emit-malli {:exec-fn user/generate-schema}}}

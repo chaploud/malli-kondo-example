@@ -4,5 +4,5 @@
 
 (defn generate-schema
   "malliのスキーマをclj-kondo向けに生成する"
-  []
-  (mc/emit!))
+  ([] (generate-schema {})) ; REPL用
+  ([_opts] (mc/emit!))) ; CLI用
