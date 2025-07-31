@@ -1,4 +1,4 @@
-{:paths ["src"]
+{:paths ["src", "dev"]
  :deps {org.clojure/clojure {:mvn/version "1.12.1"}
         metosin/malli {:mvn/version "0.19.1"}}
  :aliases

@@ -7,5 +7,13 @@
 (defn plus
   ([x] x)
   ([x y] (+ x y)))
+
 (m/=> plus [:function
-            [:=> [:cat int?]]])
+            [:=> [:cat int?] int?]
+            [:=> [:cat int? int?] int?]])
+
+(comment
+  (square 3)
+  (square "1")
+  (plus 1 2)
+  (plus 1 "2"))

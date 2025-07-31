@@ -1,0 +1,4 @@
+{:linters {:unresolved-symbol {:exclude [(malli.core/=>)]},
+           :type-mismatch {:namespaces {example.core {square {:arities {1 {:args [:int], :ret :nat-int}}},
+                                                      plus {:arities {1 {:args [:int], :ret :int},
+                                                                      2 {:args [:int :int], :ret :int}}}}}}}}
