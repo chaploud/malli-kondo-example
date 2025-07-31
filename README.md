@@ -2,17 +2,21 @@
 
 ## malliチュートリアル
 
-malliについて素早くキャッチアップするためにこちらをご参照ください。また、malliで使えるキーワード群のリファレンスとしてもお使いください(「malliのビルトインスキーマの一覧」の項目)。
+malliについて素早くキャッチアップするために以下リンクをご参照ください。
+
+malliで使えるキーワード群のリファレンスとしてもお使いください(「malliのビルトインスキーマの一覧」の項目)。
 
 [malliの基本機能チュートリアル](./malli.md)
 
 ## どうなる？
 
+エディタ上で、関数の引数の型が検知できる場合には、リントエラーが表示されるようになります。
+
 ![clj-kondoによる型の不一致警告](./image/kondo.png)
 
-## 試す
+## 実際に試す
 
-まずはこのリポジトリをクローンして、中に入ってください。
+まずはこのリポジトリをクローンして、ディレクトリ内に入ってください。
 
 ### コマンドラインから
 
@@ -26,7 +30,7 @@ src/example/core.clj:19:11: error: Expected: integer, received: string.
 linting took 47ms, errors: 2, warnings: 0
 ```
 
-### エディタを開いて
+### エディタから
 
 - Calvaでは「どうなる？」のように自動で`clj-kondo`連携されて、下線とエラー表示ガ出るはずです。
 - 他のエディタでも、`clj-kondo`連携されていれば同様のエラーが表示されるはずです。
@@ -60,16 +64,18 @@ linting took 47ms, errors: 2, warnings: 0
   (:require [malli.core :as m]))
 
 (defn square [x] (* x x))
+;; malliスキーマ定義追加
 (m/=> square [:=> [:cat int?] nat-int?])
 
 (defn plus
   ([x] x)
   ([x y] (+ x y)))
-
+;; malliスキーマ定義追加
 (m/=> plus [:function
             [:=> [:cat int?] int?]
             [:=> [:cat int? int?] int?]])
 
+;; 確認用
 (comment
   (square 3)
   (square "1")
@@ -92,7 +98,7 @@ linting took 47ms, errors: 2, warnings: 0
   ([_opts] (mc/emit!))) ; CLI用
 ```
 
-REPLで
+REPLの`user`名前空間で以下を実行
 
 ```clojure
 (generate-schema)
@@ -102,10 +108,11 @@ REPLで
 
 ### 4. 自動化への道
 
-- 毎回手動でREPLで`generate-schema`していては面倒だし忘れる可能性があるので、CLIから使えるようにした上で、lintする前に自動実行させるようにしてもいいかもしれない。
+- 毎回手動でREPLで`generate-schema`していては面倒だし忘れる可能性がある
+- CLIから使えるようにした上で、lintする前に自動実行させるようにしてもいいかもしれない。
 - CLIから実行するには、以下のコマンド実行
 
 ```sh
-clj -X:emit-malli
-clj -M:lint  # エラーがあれば▼報告される
+clj -X:emit-malli # malliのclj-kondo用の設定ファイルを生成
+clj -M:lint  # エラーがあれば報告される
 ```
