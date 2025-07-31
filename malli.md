@@ -169,6 +169,88 @@ Webアプリケーションではのデータ授受の際のバリデーショ�
   - 大方のケースではこれで十分
 - しかし、プロジェクト固有のスキーマ集、みたいなこだわりが出てきたときには、独自レジストリを作ってそれでバリデーションに活用するということもある
 
+## 関数スキーマ
+
+[本家でも関数スキーマの特集](https://github.com/metosin/malli/blob/master/docs/function-schemas.md)が組まれている通り、長いので、[関数スキーマ](./function-schemas.md)にClaudeにまとめさせた。
+
+malliで関数スキーマを定義する方法は以下の3つがある。
+
+### 1. 関数スキーマアノテーション (`m/=>`)
+
+`m/=>`マクロで関数名に対し、後からスキーマを登録できる。元の関数にシンタクティックノイズが入らないので嬉しい。
+
+```clojure
+(defn plus [x y] (+ x y))
+(m/=> plus [:=> [:cat :int :int] :int])
+```
+
+### 2. メタデータ方式 (`:malli/schema`)
+
+既存の`defn`にメタデータ挟みこむ形。悪くない。
+
+```clojure
+(defn plus
+  {:malli/schema [:=> [:cat :int :int] :int]}
+  [x y]
+  (+ x y))
+```
+
+### 3. インラインスキーマ (`mx/defn`)
+
+最も簡潔に書けてスキーマが自動登録されるが、`mx/defn`を使わないとけないのであまり好きくない。
+
+```clojure
+(require '[malli.experimental :as mx])
+
+(mx/defn plus :- :int
+  [x :- :int, y :- :int]
+  (+ x y))
+```
+
+### で、関数スキーマで何ができる？
+
+個人的に嬉しいのは、3. 自動テストデータ生成、と 4. 静的型チェック
+
+```clojure
+(require '[malli.core :as m]
+         '[malli.instrument :as mi]
+         '[malli.generator :as mg]
+         '[malli.dev :as dev]
+         '[malli.dev.pretty :as pretty])
+
+;; 1. 開発時の自動型チェック（インストルメンテーション）
+(mi/instrument!)  ; または (dev/start!)
+(plus "文字列" 2)  ; => エラー！整数が期待される
+
+;; 2. 関数の実装チェック（mi/check）
+(mi/check)
+; 登録されたスキーマと実装が一致するか検証
+; 例：戻り値の範囲が正しいか等
+
+;; 3. 自動テストデータ生成
+(mg/generate =>plus)
+; スキーマから関数のモックを自動生成
+; プロパティベーステストに活用可能
+
+;; 4. 静的型チェック（clj-kondo連携）
+; malli.devを使うと自動的にclj-kondo設定を生成
+; エディタで型エラーを表示
+
+;; 5. きれいなエラーメッセージ
+(dev/start! {:report (pretty/reporter)})
+; 型エラー時に見やすいエラー表示
+
+;; 6. ドキュメントとしての機能
+(m/function-schemas)
+; 登録された全関数のスキーマ一覧を確認
+; APIドキュメントの自動生成も可能
+
+;; 7. 本番環境での選択的検証
+(m/-instrument {:schema =>critical-function
+                :scope #{:input}})
+; 重要な関数のみ本番でも検証clojure
+```
+
 ## malliのビルトインスキーマの一覧
 
 - 何が使えるねん！は素朴な疑問なので書き出し。多いので、その意味は名前や検索で調べてください。
